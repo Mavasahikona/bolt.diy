@@ -32,8 +32,12 @@ RUN NODE_OPTIONS=--max-old-space-size=4096 pnpm run build
 # ---- production dependencies stage ----
 FROM build AS prod-deps
 
-# Keep only production deps for runtime
-RUN pnpm prune --prod --ignore-scripts
+# NOTE (self-hosted / Dokploy fix): do NOT prune devDependencies.
+# The runtime start command is `vite preview`, and vite + the plugins it loads
+# from vite.config.ts (@react-router/dev, @cloudflare/vite-plugin, unocss,
+# vite-plugin-optimize-css-modules, dotenv) are all devDependencies. Pruning them
+# makes the container crash-loop instantly with `sh: 1: vite: not found`.
+RUN echo "keeping devDependencies: vite preview needs vite + vite.config plugins"
 
 
 # ---- production stage ----
