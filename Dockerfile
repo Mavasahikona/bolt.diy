@@ -70,6 +70,7 @@ COPY --from=prod-deps /app/build /app/build
 COPY --from=prod-deps /app/node_modules /app/node_modules
 COPY --from=prod-deps /app/package.json /app/package.json
 COPY --from=prod-deps /app/wrangler.jsonc /app/wrangler.jsonc
+COPY --from=prod-deps /app/scripts/inject-worker-vars.mjs /app/scripts/inject-worker-vars.mjs
 
 # Pre-configure wrangler to disable metrics
 RUN mkdir -p /root/.config/.wrangler && \
@@ -82,7 +83,7 @@ HEALTHCHECK --interval=10s --timeout=3s --start-period=5s --retries=5 \
   CMD curl -fsS http://localhost:5173/ || exit 1
 
 # Start using dockerstart script with Wrangler
-CMD ["pnpm", "run", "dockerstart"]
+CMD ["sh", "-c", "node scripts/inject-worker-vars.mjs && pnpm run dockerstart"]
 
 
 # ---- development stage ----
