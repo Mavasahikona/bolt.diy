@@ -15,8 +15,20 @@ process.env.CLOUDFLARE_CF_FETCH_ENABLED ??= 'false';
 // Load environment variables without duplicate loading or console noise
 dotenv.config({ path: ['.env.local', '.env'], quiet: true });
 
+/*
+ * Public hostnames this instance is served on. Behind a reverse proxy
+ * (Dokploy/Traefik, Cloudflare, nginx) the Host header is the public domain,
+ * which `vite preview` rejects with "Blocked request. This host is not allowed"
+ * unless it is listed here. Override with VITE_ALLOWED_HOSTS (comma separated).
+ */
+const allowedHosts = (process.env.VITE_ALLOWED_HOSTS ?? 'diy.internetblueprint.co.za,localhost,127.0.0.1')
+  .split(',')
+  .map((host) => host.trim())
+  .filter(Boolean);
+
 export default defineConfig((config) => {
   return {
+    preview: { allowedHosts },
     define: {
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
 
