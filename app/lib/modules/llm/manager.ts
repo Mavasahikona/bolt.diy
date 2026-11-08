@@ -270,6 +270,12 @@ export class LLMManager {
      * order of ./registry, which would otherwise make the default depend on
      * which provider happens to be listed first.
      */
+    const deepseek = this._providers.get('Deepseek');
+
+    if (deepseek) {
+      return deepseek;
+    }
+
     const openRouter = this._providers.get('OpenRouter');
 
     if (openRouter) {
